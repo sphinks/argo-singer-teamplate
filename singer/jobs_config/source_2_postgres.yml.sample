@@ -1,0 +1,64 @@
+---
+
+# ------------------------------------------------------------------------------
+# General Properties
+# ------------------------------------------------------------------------------
+id: "source_2_config_postgres"         # Unique identifier of the tap
+name: "Source 2 Postgres Database"     # Name of the tap
+type: "tap-postgres"                   # !! THIS SHOULD NOT CHANGE !!
+owner: "somebody@foo.com"              # Data owner to contact
+#send_alert: False                     # Optional: Disable all configured alerts on this tap
+
+
+# ------------------------------------------------------------------------------
+# Source (Tap) - PostgreSQL connection details
+# ------------------------------------------------------------------------------
+db_conn:
+  host: "$DATASOURCE_HOST"             # PostgreSQL host
+  port: 5432                           # PostgreSQL port
+  user: "$DATASOURCE_USERNAME"         # PostfreSQL user
+  password: "$DATASOURCE_PASSWORD"     # Plain string or vault encrypted
+  dbname: "$DATABASE_NAME"             # PostgreSQL database name
+  filter_schemas: "public"   # Optional: Scan only the required schemas
+                                       #           to improve the performance of
+                                       #           data extraction
+  fastsync_parallelism: 4
+
+
+# ------------------------------------------------------------------------------
+# Destination (Target) - Target properties
+# Connection details should be in the relevant target YAML file
+# ------------------------------------------------------------------------------
+target: "snowflake"                    # ID of the target connector where the data will be loaded
+batch_size_rows: 20000                 # Batch size for the stream to optimise load performance
+stream_buffer_size: 0                  # In-memory buffer size (MB) between taps and targets for asynchronous data pipes
+
+
+# ------------------------------------------------------------------------------
+# Source to target Schema mapping
+# ------------------------------------------------------------------------------
+schemas:
+
+  - source_schema: "public"            # Source schema in postgres with tables
+    target_schema: "public"    # Target schema in the destination Data Warehouse
+    #target_schema_select_permissions:  # Optional: Grant SELECT on schema and tables that created
+    #  - grp_stats
+
+    # List of tables to replicate from Postgres to destination Data Warehouse
+    #
+    # Please check the Replication Strategies section in the documentation to understand the differences.
+    # For LOG_BASED replication method you might need to adjust the source mysql/ mariadb configuration.
+    tables:
+      - table_name: "table1"
+        replication_method: "FULL_TABLE"   # One of INCREMENTAL, LOG_BASED and FULL_TABLE
+
+      - table_name: "table2"
+        replication_method: "FULL_TABLE"   # One of INCREMENTAL, LOG_BASED and FULL_TABLE
+
+      - table_name: "table3"
+        replication_method: "FULL_TABLE"   # One of INCREMENTAL, LOG_BASED and FULL_TABLE
+
+  # You can add as many schemas as you need...
+  # Uncommend this if you want replicate tables from multiple schemas
+  #- source_schema: "another_schema_in_postgres" 
+  #  target_schema: "another

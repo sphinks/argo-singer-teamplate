@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  namespace: argo-prod
+  name: everyday-workflow
+  labels:
+    jobgroup: songbird
+spec:
+  schedule: "0 9 * * *"
+  concurrencyPolicy: "Forbid"
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 600
+  workflowSpec:
+    entrypoint: flow-control
+    templates:
+    - name: flow-control
+      dag:
+        tasks:
+        - name: source-b1
+          templateRef: # You can reference a "template" from another "WorkflowTemplate" using this field
+            name: workflow-source-1   # This is the name of the "WorkflowTemplate" CRD that contains the "template" you want
+            template: source-1-batch
+        - name: source-b2
+          templateRef:
+            name: workflow-source-2
+            template: source-2-batch
+          depends: source-b1

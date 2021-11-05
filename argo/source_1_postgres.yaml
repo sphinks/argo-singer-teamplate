@@ -1,0 +1,54 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  namespace: argo-prod
+  name: workflow-source-1
+  labels:
+    jobgroup: somegroup
+spec:
+  templates:
+    - name: source-1-batch
+      metadata:
+        labels:
+          jobgroup: somegroup
+      container:
+        image: <path to you docker image>
+        resources: # limit the resources
+          requests:
+            memory: 1Gi
+            cpu: 1500m
+        command: [ "/vault/vault-env" ]
+        args:
+          [
+            "/bin/bash",
+            "-c",
+            "./run.sh source_1",
+          ]
+        env:
+          - name: AWS_ACCESS_KEY_ID
+            value: "vault:path/to/AWS_ACCESS_KEY_ID or just value in case you need it"
+          - name: AWS_SECRET_ACCESS_KEY
+            value: "vault:path/to/AWS_SECRET_ACCESS_KEY or just value in case you need it"
+          - name: DATASOURCE_HOST
+            value: "vault:path/to/source_1/host or just value"
+          - name: DATABASE_NAME
+            value: "vault:path/to/source_1/database or just value"
+          - name: DATASOURCE_USERNAME
+            value: "vault:path/to/source_1/username or just value"
+          - name: DATASOURCE_PASSWORD
+            value: "vault:path/to/source_1/password or just value"
+          - name: SNOWFLAKE_HOST
+            value: "vault:path/to/source_1/snowflake/host or just value"
+          - name: SNOWFLAKE_DATABASE
+            value: "vault:path/to/source_1/snowflake/database or just value"
+          - name: SNOWFLAKE_USERNAME
+            value: "vault:path/to/source_1/snowflake/username or just value"
+          - name: SNOWFLAKE_PASSWORD
+            value: "vault:path/to/source_1/snowflake/password or just value"
+          # Vault settings in case you are using it
+          #- name: VAULT_ADDR
+          #  value: https://url.to.vault
+          #- name: VAULT_PATH
+          #  value: path_to_vault
+          #- name: VAULT_ROLE
+          #  value: vault_role
