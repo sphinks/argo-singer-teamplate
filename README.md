@@ -1,0 +1,1 @@
+# argo-singer-teamplate
