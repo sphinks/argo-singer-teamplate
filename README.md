@@ -1,4 +1,4 @@
-# argo-singer-teamplate
+# argo-singer-template
 
 A basic example of using Argo Workflows and Singer jobs to create ETL based on Singer taps and target and orchestrated by Argo.
 
